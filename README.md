@@ -1,0 +1,74 @@
+# organizador
+
+A lightweight task organizer for your daily life. Categorize tasks, set deadlines, get push notifications — all with a clean, dark-mode-ready interface.
+
+## Features
+
+- **Full CRUD** — Create, edit, complete, and delete tasks
+- **Categories** — Tag tasks as Técnico, Normal, Eventos, or Doméstica
+- **Deadline badges** — "Due today", "X days overdue", upcoming highlights
+- **Smart filtering** — Filter by category + search by title
+- **Drag & drop** — Reorder tasks by priority
+- **Push notifications** — Get browser reminders for upcoming tasks
+- **Dark mode** — Toggle between light and dark themes
+- **Responsive** — Works on desktop and mobile
+
+## Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18 + Vite |
+| Backend | Express.js |
+| Database | PostgreSQL |
+| Notifications | Web Push API |
+| Deploy | Render |
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20+
+- PostgreSQL instance
+
+### Setup
+
+```bash
+# Clone and install
+git clone https://github.com/Breno-V/organizador-de-tarefas
+cd organizador-de-tarefas
+npm install
+
+# Install client & server deps
+npm install --prefix frontend
+npm install --prefix server
+
+# Configure database
+export DATABASE_URL=postgresql://user:pass@host:5432/organizador
+
+# Start in dev mode (client + server concurrently)
+npm run dev
+```
+
+The client runs on `http://localhost:5173` and proxies API calls to the server on port `3001`.
+
+### Build for production
+
+```bash
+npm run build
+npm start
+```
+
+The server serves the built frontend from `frontend/dist/`.
+
+## Daily usage tips
+
+1. **Add tasks** with a deadline — the app highlights what's due soon
+2. **Use categories** to separate work (Técnico), personal (Normal), events, and home tasks
+3. **Check "Próximos dias"** at the top for a quick 7-day view
+4. **Drag to reorder** — the most important tasks stay on top
+5. **Enable notifications** — you'll get reminded before deadlines pass
+6. **Toggle dark mode** in settings for late-night planning
+
+## License
+
+MIT

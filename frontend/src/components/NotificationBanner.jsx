@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { urlBase64ToUint8Array } from '../utils/push'
 
 export default function NotificationBanner() {
   const [visible, setVisible] = useState(false)
@@ -27,6 +28,7 @@ export default function NotificationBanner() {
         await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(sub.toJSON()),
         })
       } catch {}
@@ -62,11 +64,4 @@ export default function NotificationBanner() {
       </div>
     </div>
   )
-}
-
-function urlBase64ToUint8Array(base64) {
-  const padding = '='.repeat((4 - base64.length % 4) % 4)
-  const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/')
-  const raw = atob(b64)
-  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)))
 }

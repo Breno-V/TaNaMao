@@ -1,7 +1,10 @@
 import { Router } from 'express'
 import { getPool } from '../db/init.js'
+import { authMiddleware } from '../middleware/auth.js'
 
 const router = Router()
+
+router.use(authMiddleware)
 
 function tryHandler(fn) {
   return (req, res, next) => {
@@ -31,8 +34,9 @@ router.get('/', tryHandler(async (req, res) => {
        WHERE tc.tarefa_id = t.id), '[]'::json
     ) as categorias
     FROM tarefas t
+    WHERE t.usuario_id = $1
     ORDER BY t.ordem ASC, t.data_entrega ASC, t.criada_em DESC
-  `)
+  `, [req.user.id])
 
   res.json(rows.map(tarefaComCategorias))
 }))
@@ -63,14 +67,17 @@ router.post('/', tryHandler(async (req, res) => {
     return res.status(400).json({ error: 'A data não pode ser anterior a hoje.' })
   }
 
-  const { rows: [maxRow] } = await db.query('SELECT COALESCE(MAX(ordem), -1) + 1 as next FROM tarefas')
+  const { rows: [maxRow] } = await db.query(
+    'SELECT COALESCE(MAX(ordem), -1) + 1 as next FROM tarefas WHERE usuario_id = $1',
+    [req.user.id]
+  )
   const nextOrdem = maxRow.next
 
   const { rows } = await db.query(`
-    INSERT INTO tarefas (titulo, descricao, data_entrega, ordem)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO tarefas (titulo, descricao, data_entrega, ordem, usuario_id)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING id
-  `, [titulo, descricao || '', data_entrega || null, nextOrdem])
+  `, [titulo, descricao || '', data_entrega || null, nextOrdem, req.user.id])
 
   const tarefaId = rows[0].id
 
@@ -106,8 +113,11 @@ router.put('/:id', tryHandler(async (req, res) => {
   if (concluida !== undefined) { updates.push(`concluida = $${idx++}`); params.push(concluida) }
 
   if (updates.length > 0) {
-    params.push(id)
-    await db.query(`UPDATE tarefas SET ${updates.join(', ')} WHERE id = $${idx}`, params)
+    params.push(id, req.user.id)
+    await db.query(
+      `UPDATE tarefas SET ${updates.join(', ')} WHERE id = $${idx} AND usuario_id = $${idx + 1}`,
+      params
+    )
   }
 
   if (categorias !== undefined) {
@@ -146,7 +156,10 @@ router.put('/reorder', tryHandler(async (req, res) => {
   try {
     await client.query('BEGIN')
     for (const item of orders) {
-      await client.query('UPDATE tarefas SET ordem = $1 WHERE id = $2', [item.ordem, item.id])
+      await client.query(
+        'UPDATE tarefas SET ordem = $1 WHERE id = $2 AND usuario_id = $3',
+        [item.ordem, item.id, req.user.id]
+      )
     }
     await client.query('COMMIT')
     res.json({ ok: true })
@@ -161,7 +174,7 @@ router.put('/reorder', tryHandler(async (req, res) => {
 router.delete('/:id', tryHandler(async (req, res) => {
   const db = getPool()
   const { id } = req.params
-  await db.query('DELETE FROM tarefas WHERE id = $1', [id])
+  await db.query('DELETE FROM tarefas WHERE id = $1 AND usuario_id = $2', [id, req.user.id])
   res.status(204).end()
 }))
 

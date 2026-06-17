@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTheme } from './hooks/useTheme'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import KpiFilter from './components/KpiFilter'
 import CardTarefa from './components/CardTarefa'
 import FormTarefa from './components/FormTarefa'
@@ -7,15 +8,13 @@ import ProximasTarefas from './components/ProximasTarefas'
 import ConfirmDialog from './components/ConfirmDialog'
 import SettingsPanel from './components/SettingsPanel'
 import NotificationBanner from './components/NotificationBanner'
+import LoginForm from './components/LoginForm'
+import RegisterForm from './components/RegisterForm'
 import { ToastProvider, useToast } from './components/Toast'
+import { toLocalDate } from './utils/date'
 import './App.css'
 
 const API = '/api'
-
-function toLocalDate(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number)
-  return new Date(y, m - 1, d)
-}
 
 function getPeriodoTasks(tasks) {
   const today = new Date()
@@ -37,6 +36,8 @@ function getPeriodoTasks(tasks) {
 
 function InnerApp() {
   const { theme, toggle: toggleTheme } = useTheme()
+  const { user, loading: authLoading, logout } = useAuth()
+  const [showRegister, setShowRegister] = useState(false)
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState(() => localStorage.getItem('taskFilter') || null)
@@ -57,7 +58,7 @@ function InnerApp() {
   const fetchTasks = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${API}/tarefas`)
+      const res = await fetch(`${API}/tarefas`, { credentials: 'include' })
       const data = await res.json()
       setTasks(data)
     } catch (err) {
@@ -68,7 +69,7 @@ function InnerApp() {
     }
   }, [toast])
 
-  useEffect(() => { fetchTasks() }, [fetchTasks])
+  useEffect(() => { if (user) fetchTasks() }, [fetchTasks, user])
 
   useEffect(() => {
     if (filter) {
@@ -92,6 +93,7 @@ function InnerApp() {
         await fetch(`${API}/tarefas/${editing.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(data),
         })
         toast('Tarefa salva')
@@ -99,6 +101,7 @@ function InnerApp() {
         await fetch(`${API}/tarefas`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(data),
         })
         toast('Tarefa criada')
@@ -117,6 +120,7 @@ function InnerApp() {
       await fetch(`${API}/tarefas/${tarefa.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ concluida: tarefa.concluida ? 0 : 1 }),
       })
       fetchTasks()
@@ -134,7 +138,7 @@ function InnerApp() {
   async function confirmDeleteTask() {
     if (!confirmDelete) return
     try {
-      await fetch(`${API}/tarefas/${confirmDelete}`, { method: 'DELETE' })
+      await fetch(`${API}/tarefas/${confirmDelete}`, { method: 'DELETE', credentials: 'include' })
       setConfirmDelete(null)
       fetchTasks()
       toast('Tarefa excluída')
@@ -150,10 +154,12 @@ function InnerApp() {
       await fetch(`${API}/tarefas/reorder`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ orders }),
       })
     } catch (err) {
       console.error('Erro ao reordenar:', err)
+      toast('Erro ao reordenar', 'error')
     }
   }
 
@@ -190,14 +196,29 @@ function InnerApp() {
     setShowForm(true)
   }
 
+  if (authLoading) return null
+
+  if (!user) {
+    return showRegister
+      ? <RegisterForm onSwitchToLogin={() => setShowRegister(false)} theme={theme} onToggleTheme={toggleTheme} />
+      : <LoginForm onSwitchToRegister={() => setShowRegister(true)} theme={theme} onToggleTheme={toggleTheme} />
+  }
+
   return (
     <div className="app">
       <header className="header">
         <div className="header-left">
           <h1 className="app-title">organizador</h1>
-          <span className="app-subtitle">tarefas da semana</span>
+          <span className="app-subtitle">{user.nome}</span>
         </div>
         <div className="header-actions">
+          <button className="auth-logout-btn" onClick={logout} title="Sair" aria-label="Sair">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" />
+              <polyline points="10 12 14 8 10 4" />
+              <line x1="14" y1="8" x2="6" y2="8" />
+            </svg>
+          </button>
           <button className="theme-toggle" onClick={() => setShowSettings(true)} title="Configurar" aria-label="Configurar">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="9" cy="9" r="5" />
@@ -325,8 +346,10 @@ function InnerApp() {
 
 export default function App() {
   return (
-    <ToastProvider>
-      <InnerApp />
-    </ToastProvider>
+    <AuthProvider>
+      <ToastProvider>
+        <InnerApp />
+      </ToastProvider>
+    </AuthProvider>
   )
 }

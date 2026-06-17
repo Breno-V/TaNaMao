@@ -1,4 +1,5 @@
 import CardTarefa from './CardTarefa'
+import { toLocalDate } from '../utils/date'
 
 function getProximas(tasks) {
   const today = new Date()
@@ -7,12 +8,12 @@ function getProximas(tasks) {
   return tasks
     .filter(t => {
       if (!t.data_entrega || t.concluida) return false
-      const target = new Date(t.data_entrega)
+      const target = toLocalDate(t.data_entrega)
       target.setHours(0, 0, 0, 0)
       const diff = (target - today) / (1000 * 60 * 60 * 24)
       return diff >= 0 && diff <= 7
     })
-    .sort((a, b) => new Date(a.data_entrega) - new Date(b.data_entrega))
+    .sort((a, b) => toLocalDate(a.data_entrega) - toLocalDate(b.data_entrega))
 }
 
 export default function ProximasTarefas({ tasks, onToggle, onEdit, onDelete }) {

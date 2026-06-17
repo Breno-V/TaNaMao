@@ -3,7 +3,7 @@ export default function ConfirmDialog({ titulo, onConfirm, onCancel }) {
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>
         <p className="confirm-text">
-          Excluir <strong>"{titulo}"</strong>?
+          Excluir <strong>"{titulo || '(sem título)'}"</strong>?
         </p>
         <p className="confirm-subtext">Essa ação não pode ser desfeita.</p>
         <div className="confirm-actions">

@@ -1,9 +1,9 @@
 const CATEGORIES = [
   { key: null, label: 'Todas' },
-  { key: 'tecnico', label: 'Técnico' },
-  { key: 'normal', label: 'Normal' },
+  { key: 'tecnico', label: 'Matéria Técnica' },
+  { key: 'normal', label: 'Matéria Normal' },
   { key: 'eventos', label: 'Eventos' },
-  { key: 'domestica', label: 'Domésticas' },
+  { key: 'domestica', label: 'Atividades Domésticas' },
 ]
 
 export default function KpiFilter({ tasks, active, onChange }) {
@@ -21,7 +21,7 @@ export default function KpiFilter({ tasks, active, onChange }) {
       {CATEGORIES.map(cat => (
         <button
           key={cat.key ?? '__all'}
-          className={`kpi-btn${active === cat.key ? ' active' : ''}`}
+          className={`kpi-btn${(active === cat.key || (!active && cat.key === null)) ? ' active' : ''}`}
           onClick={() => onChange(cat.key)}
         >
           {cat.label}

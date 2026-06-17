@@ -1,21 +1,19 @@
 import { useState } from 'react'
+import { toLocalDate } from '../utils/date'
 
 const CATEGORIES = [
-  { key: 'tecnico', label: 'Técnico' },
-  { key: 'normal', label: 'Normal' },
+  { key: 'tecnico', label: 'Matéria Técnica' },
+  { key: 'normal', label: 'Matéria Normal' },
   { key: 'eventos', label: 'Eventos' },
-  { key: 'domestica', label: 'Doméstica' },
+  { key: 'domestica', label: 'Atividades Domésticas' },
 ]
 
 function toInputDate(dateStr) {
   if (!dateStr) return ''
-  const d = new Date(dateStr)
-  return d.toISOString().split('T')[0]
-}
-
-function toLocalDate(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number)
-  return new Date(y, m - 1, d)
+  const datePart = dateStr.split('T')[0]
+  const [y, m, d] = datePart.split('-').map(Number)
+  const pad = n => String(n).padStart(2, '0')
+  return `${y}-${pad(m)}-${pad(d)}`
 }
 
 function isPastDate(dateStr) {
@@ -79,6 +77,7 @@ export default function FormTarefa({ tarefa, onSave, onCancel }) {
               value={titulo}
               onChange={e => setTitulo(e.target.value)}
               placeholder="O que precisa ser feito?"
+              maxLength={200}
               autoFocus
             />
           </div>
@@ -90,6 +89,7 @@ export default function FormTarefa({ tarefa, onSave, onCancel }) {
               value={descricao}
               onChange={e => setDescricao(e.target.value)}
               placeholder="Detalhes (opcional)"
+              maxLength={1000}
             />
           </div>
 

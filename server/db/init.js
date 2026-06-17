@@ -33,6 +33,16 @@ export async function initDb() {
         categoria_id INTEGER NOT NULL REFERENCES categorias(id) ON DELETE CASCADE,
         PRIMARY KEY (tarefa_id, categoria_id)
       );
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id SERIAL PRIMARY KEY,
+        nome TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        senha_hash TEXT NOT NULL,
+        criada_em TIMESTAMP DEFAULT NOW()
+      );
+
+      ALTER TABLE tarefas ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
+
       CREATE TABLE IF NOT EXISTS push_subscriptions (
         id SERIAL PRIMARY KEY,
         endpoint TEXT NOT NULL UNIQUE,

@@ -1,7 +1,4 @@
-function toLocalDate(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number)
-  return new Date(y, m - 1, d)
-}
+import { toLocalDate } from '../utils/date'
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -56,10 +53,10 @@ const TAG_CLASSES = {
 }
 
 const TAG_LABELS = {
-  tecnico: 'Técnico',
-  normal: 'Normal',
+  tecnico: 'Matéria Técnica',
+  normal: 'Matéria Normal',
   eventos: 'Eventos',
-  domestica: 'Doméstica',
+  domestica: 'Atividades Domésticas',
 }
 
 export default function CardTarefa({ tarefa, onToggle, onEdit, onDelete, compact, onDragStart, onDragOver, onDrop, isDragging }) {
