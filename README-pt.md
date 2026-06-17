@@ -1,5 +1,7 @@
 # organizador
 
+> **Acesse em:** [organizador-de-tarefas-wtcf.onrender.com](https://organizador-de-tarefas-wtcf.onrender.com)
+
 Um organizador de tarefas leve para o seu dia a dia. Categorize tarefas, defina prazos, receba notificações push — tudo com uma interface limpa e suporte a tema escuro.
 
 ## Funcionalidades
@@ -9,7 +11,9 @@ Um organizador de tarefas leve para o seu dia a dia. Categorize tarefas, defina 
 - **Badges de prazo** — "Vence hoje", "X dias atrasado", destaque de próximos prazos
 - **Filtros inteligentes** — Filtre por categoria + busque por título
 - **Arrastar e soltar** — Reordene tarefas por prioridade
+- **Autenticação** — Login/registro com JWT e bcrypt
 - **Notificações push** — Receba lembretes no navegador
+- **PWA** — Instalável na tela inicial com suporte offline parcial
 - **Modo escuro** — Alterne entre temas claro e escuro
 - **Responsivo** — Funciona no desktop e no celular
 
@@ -42,12 +46,15 @@ npm install
 npm install --prefix frontend
 npm install --prefix server
 
-# Configure o banco de dados
-export DATABASE_URL=postgresql://usuario:senha@host:5432/organizador
+# Crie o arquivo .env do servidor
+echo 'DATABASE_URL=postgresql://usuario:senha@host:5432/organizador' > server/.env
+echo 'JWT_SECRET=seu-segredo-aqui' >> server/.env
 
 # Inicie em modo dev (cliente + servidor em paralelo)
 npm run dev
 ```
+
+O servidor lê as variáveis do `server/.env` automaticamente via `--env-file` (nativo do Node 20.6+).
 
 O cliente roda em `http://localhost:5173` e faz proxy das chamadas de API para o servidor na porta `3001`.
 

@@ -1,5 +1,7 @@
 # organizador
 
+> **Live at:** [organizador-de-tarefas-wtcf.onrender.com](https://organizador-de-tarefas-wtcf.onrender.com)
+
 A lightweight task organizer for your daily life. Categorize tasks, set deadlines, get push notifications — all with a clean, dark-mode-ready interface.
 
 ## Features
@@ -9,7 +11,9 @@ A lightweight task organizer for your daily life. Categorize tasks, set deadline
 - **Deadline badges** — "Due today", "X days overdue", upcoming highlights
 - **Smart filtering** — Filter by category + search by title
 - **Drag & drop** — Reorder tasks by priority
+- **Authentication** — Login/register with JWT and bcrypt
 - **Push notifications** — Get browser reminders for upcoming tasks
+- **PWA** — Installable on home screen with partial offline support
 - **Dark mode** — Toggle between light and dark themes
 - **Responsive** — Works on desktop and mobile
 
@@ -42,12 +46,15 @@ npm install
 npm install --prefix frontend
 npm install --prefix server
 
-# Configure database
-export DATABASE_URL=postgresql://user:pass@host:5432/organizador
+# Create server .env file
+echo 'DATABASE_URL=postgresql://user:pass@host:5432/organizador' > server/.env
+echo 'JWT_SECRET=your-secret-here' >> server/.env
 
 # Start in dev mode (client + server concurrently)
 npm run dev
 ```
+
+The server reads env vars from `server/.env` automatically via `--env-file` (built into Node 20.6+).
 
 The client runs on `http://localhost:5173` and proxies API calls to the server on port `3001`.
 
