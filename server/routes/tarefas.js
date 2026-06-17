@@ -152,6 +152,12 @@ router.put('/reorder', tryHandler(async (req, res) => {
     return res.status(400).json({ error: 'orders must be an array' })
   }
 
+  for (const item of orders) {
+    if (!item.id || typeof item.ordem !== 'number') {
+      return res.status(400).json({ error: 'Cada item deve ter id (number) e ordem (number).' })
+    }
+  }
+
   const client = await db.connect()
   try {
     await client.query('BEGIN')

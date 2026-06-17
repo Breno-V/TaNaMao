@@ -32,46 +32,56 @@ async function checkAndNotify() {
     const today = getToday()
 
     const { rows: subscriptions } = await db.query(
-      'SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE reminders = true'
+      `SELECT endpoint, p256dh, auth, usuario_id
+       FROM push_subscriptions WHERE reminders = true AND usuario_id IS NOT NULL`
     )
 
     if (subscriptions.length === 0) return
 
-    const { rows: dueTasks } = await db.query(
-      `SELECT titulo, data_entrega FROM tarefas
-       WHERE concluida = false AND data_entrega IS NOT NULL AND data_entrega <= $1
-       ORDER BY data_entrega ASC`,
-      [today]
-    )
-
-    if (dueTasks.length === 0) return
-
-    const todayTasks = dueTasks.filter(t => t.data_entrega === today)
-    const overdueTasks = dueTasks.filter(t => t.data_entrega < today)
-
-    let title = ''
-    let body = ''
-
-    if (todayTasks.length > 0 && overdueTasks.length > 0) {
-      title = `${todayTasks.length + overdueTasks.length} tarefas pendentes`
-      body = `${todayTasks.length} vencem hoje, ${overdueTasks.length} atrasadas`
-    } else if (todayTasks.length > 0) {
-      title = `${todayTasks.length} tarefa${todayTasks.length > 1 ? 's' : ''} vence${todayTasks.length > 1 ? 'm' : ''} hoje`
-      body = todayTasks.slice(0, 3).map(t => t.titulo).join(', ')
-      if (todayTasks.length > 3) body += ` e mais ${todayTasks.length - 3}`
-    } else if (overdueTasks.length > 0) {
-      title = `${overdueTasks.length} tarefa${overdueTasks.length > 1 ? 's' : ''} atrasada${overdueTasks.length > 1 ? 's' : ''}`
-      body = overdueTasks.slice(0, 3).map(t => t.titulo).join(', ')
-      if (overdueTasks.length > 3) body += ` e mais ${overdueTasks.length - 3}`
+    const userSubs = {}
+    for (const sub of subscriptions) {
+      if (!userSubs[sub.usuario_id]) userSubs[sub.usuario_id] = []
+      userSubs[sub.usuario_id].push(sub)
     }
 
-    if (!title) return
+    for (const userId of Object.keys(userSubs)) {
+      const { rows: dueTasks } = await db.query(
+        `SELECT titulo, data_entrega FROM tarefas
+         WHERE concluida = false AND usuario_id = $1
+         AND data_entrega IS NOT NULL AND data_entrega <= $2
+         ORDER BY data_entrega ASC`,
+        [userId, today]
+      )
 
-    for (const sub of subscriptions) {
-      sendNotification({
-        endpoint: sub.endpoint,
-        keys: { p256dh: sub.p256dh, auth: sub.auth },
-      }, title, body)
+      if (dueTasks.length === 0) continue
+
+      const todayTasks = dueTasks.filter(t => t.data_entrega === today)
+      const overdueTasks = dueTasks.filter(t => t.data_entrega < today)
+
+      let title = ''
+      let body = ''
+
+      if (todayTasks.length > 0 && overdueTasks.length > 0) {
+        title = `${todayTasks.length + overdueTasks.length} tarefas pendentes`
+        body = `${todayTasks.length} vencem hoje, ${overdueTasks.length} atrasadas`
+      } else if (todayTasks.length > 0) {
+        title = `${todayTasks.length} tarefa${todayTasks.length > 1 ? 's' : ''} vence${todayTasks.length > 1 ? 'm' : ''} hoje`
+        body = todayTasks.slice(0, 3).map(t => t.titulo).join(', ')
+        if (todayTasks.length > 3) body += ` e mais ${todayTasks.length - 3}`
+      } else if (overdueTasks.length > 0) {
+        title = `${overdueTasks.length} tarefa${overdueTasks.length > 1 ? 's' : ''} atrasada${overdueTasks.length > 1 ? 's' : ''}`
+        body = overdueTasks.slice(0, 3).map(t => t.titulo).join(', ')
+        if (overdueTasks.length > 3) body += ` e mais ${overdueTasks.length - 3}`
+      }
+
+      if (!title) continue
+
+      for (const sub of userSubs[userId]) {
+        sendNotification({
+          endpoint: sub.endpoint,
+          keys: { p256dh: sub.p256dh, auth: sub.auth },
+        }, title, body)
+      }
     }
   } catch (err) {
     console.error('Scheduler error:', err)

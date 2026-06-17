@@ -4,6 +4,7 @@ import webpush from 'web-push'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import { authMiddleware } from '../middleware/auth.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -31,7 +32,7 @@ router.get('/vapid-public-key', (req, res) => {
   res.type('text/plain').send(vapidKeys.publicKey)
 })
 
-router.post('/subscribe', async (req, res) => {
+router.post('/subscribe', authMiddleware, async (req, res) => {
   try {
     const { endpoint, keys, reminders } = req.body
     if (!endpoint || !keys || !keys.p256dh || !keys.auth) {
@@ -43,13 +44,13 @@ router.post('/subscribe', async (req, res) => {
     )
     if (existing.length > 0) {
       await db.query(
-        'UPDATE push_subscriptions SET p256dh = $1, auth = $2, reminders = $3, updated_at = NOW() WHERE id = $4',
-        [keys.p256dh, keys.auth, reminders, existing[0].id]
+        'UPDATE push_subscriptions SET p256dh = $1, auth = $2, reminders = $3, usuario_id = $4, updated_at = NOW() WHERE id = $5',
+        [keys.p256dh, keys.auth, reminders, req.user.id, existing[0].id]
       )
     } else {
       await db.query(
-        'INSERT INTO push_subscriptions (endpoint, p256dh, auth, reminders) VALUES ($1, $2, $3, $4)',
-        [endpoint, keys.p256dh, keys.auth, reminders]
+        'INSERT INTO push_subscriptions (endpoint, p256dh, auth, reminders, usuario_id) VALUES ($1, $2, $3, $4, $5)',
+        [endpoint, keys.p256dh, keys.auth, reminders, req.user.id]
       )
     }
     res.json({ ok: true })
@@ -59,12 +60,12 @@ router.post('/subscribe', async (req, res) => {
   }
 })
 
-router.post('/unsubscribe', async (req, res) => {
+router.post('/unsubscribe', authMiddleware, async (req, res) => {
   try {
     const { endpoint } = req.body
     if (!endpoint) return res.status(400).json({ error: 'Missing endpoint.' })
     const db = getPool()
-    await db.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [endpoint])
+    await db.query('DELETE FROM push_subscriptions WHERE endpoint = $1 AND usuario_id = $2', [endpoint, req.user.id])
     res.json({ ok: true })
   } catch (err) {
     console.error('Push unsubscribe error:', err)

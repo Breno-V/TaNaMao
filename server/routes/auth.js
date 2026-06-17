@@ -1,9 +1,18 @@
 import { Router } from 'express'
+import rateLimit from 'express-rate-limit'
 import bcrypt from 'bcryptjs'
 import { getPool } from '../db/init.js'
 import { signToken, authMiddleware } from '../middleware/auth.js'
 
 const router = Router()
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Muitas tentativas. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
 
 function tryHandler(fn) {
   return (req, res, next) => {
@@ -11,7 +20,7 @@ function tryHandler(fn) {
   }
 }
 
-router.post('/register', tryHandler(async (req, res) => {
+router.post('/register', authLimiter, tryHandler(async (req, res) => {
   const db = getPool()
   const { nome, email, senha } = req.body
 
@@ -20,6 +29,9 @@ router.post('/register', tryHandler(async (req, res) => {
   }
   if (!email || !email.trim()) {
     return res.status(400).json({ error: 'O email é obrigatório.' })
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return res.status(400).json({ error: 'Email inválido.' })
   }
   if (!senha || senha.length < 6) {
     return res.status(400).json({ error: 'A senha deve ter no mínimo 6 caracteres.' })
@@ -43,13 +55,13 @@ router.post('/register', tryHandler(async (req, res) => {
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'strict',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   })
   res.status(201).json({ id: user.id, nome: user.nome, email: user.email })
 }))
 
-router.post('/login', tryHandler(async (req, res) => {
+router.post('/login', authLimiter, tryHandler(async (req, res) => {
   const db = getPool()
   const { email, senha } = req.body
 
@@ -76,7 +88,7 @@ router.post('/login', tryHandler(async (req, res) => {
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'strict',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   })
   res.json({ id: user.id, nome: user.nome, email: user.email })
