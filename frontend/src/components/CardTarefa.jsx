@@ -89,13 +89,23 @@ export default function CardTarefa({ tarefa, onToggle, onEdit, onDelete, compact
       onDrop={() => onDrop?.(tarefa.id)}
     >
       <div className="card-header">
-        <span
-          className={`card-title${tarefa.concluida ? ' done' : ''}`}
-          onClick={() => onToggle?.(tarefa)}
-          style={{ cursor: onToggle ? 'pointer' : 'default' }}
-        >
-          {tarefa.titulo}
-        </span>
+        <div className="card-title-wrap">
+          <button
+            className={`card-toggle-btn${tarefa.concluida ? ' card-toggle-btn--done' : ''}`}
+            onClick={() => onToggle?.(tarefa)}
+            aria-label={tarefa.concluida ? 'Marcar como pendente' : 'Marcar como concluída'}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              {tarefa.concluida
+                ? <polyline points="20 6 9 17 4 12" />
+                : <circle cx="12" cy="12" r="9" />
+              }
+            </svg>
+          </button>
+          <span className={`card-title${tarefa.concluida ? ' done' : ''}`}>
+            {tarefa.titulo}
+          </span>
+        </div>
         <div className="card-header-right">
           {!compact && !tarefa.concluida && today && !urgent && (
             <span className="badge badge--today">Vence hoje</span>

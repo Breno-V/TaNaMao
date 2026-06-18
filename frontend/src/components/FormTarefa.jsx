@@ -51,6 +51,9 @@ export default function FormTarefa({ tarefa, onSave, onCancel }) {
 
   function handleDateChange(value) {
     setDataEntrega(value)
+    if (!value) {
+      setHoraEntrega('23:59')
+    }
     if (isPastDate(value)) {
       setDateError(true)
     } else {
@@ -133,17 +136,15 @@ export default function FormTarefa({ tarefa, onSave, onCancel }) {
                 </button>
               )}
             </div>
-            {dataEntrega && (
-              <div className="time-input-wrap">
-                <label className="form-label form-label--inline">Horário</label>
-                <input
-                  type="time"
-                  className="form-input form-input--time"
-                  value={horaEntrega}
-                  onChange={e => setHoraEntrega(e.target.value)}
-                />
-              </div>
-            )}
+            <div className="time-input-wrap">
+              <label className="form-label form-label--inline">Horário</label>
+              <input
+                type="time"
+                className="form-input form-input--time"
+                value={horaEntrega}
+                onChange={e => setHoraEntrega(e.target.value)}
+              />
+            </div>
             {dateError && <p className="form-error">A data não pode ser anterior a hoje.</p>}
           </div>
 
