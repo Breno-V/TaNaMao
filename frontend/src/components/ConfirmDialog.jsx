@@ -1,4 +1,14 @@
+import { useEffect } from 'react'
+
 export default function ConfirmDialog({ titulo, onConfirm, onCancel }) {
+  useEffect(() => {
+    function handleKey(e) {
+      if (e.key === 'Escape') onCancel()
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [onCancel])
+
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal confirm-modal" onClick={e => e.stopPropagation()}>

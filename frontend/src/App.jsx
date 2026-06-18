@@ -11,6 +11,7 @@ import NotificationBanner from './components/NotificationBanner'
 import LoginForm from './components/LoginForm'
 import RegisterForm from './components/RegisterForm'
 import { ToastProvider, useToast } from './components/Toast'
+import LoadingScreen from './components/LoadingScreen'
 import { toLocalDate } from './utils/date'
 import './App.css'
 
@@ -196,7 +197,7 @@ function InnerApp() {
     setShowForm(true)
   }
 
-  if (authLoading) return null
+  if (authLoading) return <LoadingScreen />
 
   if (!user) {
     return showRegister
@@ -231,13 +232,14 @@ function InnerApp() {
       </header>
 
       <KpiFilter
-        tasks={periodoTasks}
+        tasks={tasks}
         active={filter}
         onChange={setFilter}
       />
 
       <ProximasTarefas
         tasks={periodoTasks}
+        search={search}
         onToggle={handleToggle}
         onEdit={openEdit}
         onDelete={handleDelete}
@@ -290,11 +292,13 @@ function InnerApp() {
 
             {allFilteredTasks.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-icon">📋</div>
+                <div className="empty-state-icon" aria-hidden="true">📋</div>
                 <p className="empty-state-text">
-                  {filter
-                    ? 'Nenhuma tarefa nessa categoria.'
-                    : 'Nenhuma tarefa ainda. Clique em "+ Nova" para começar.'}
+                  {search
+                    ? `Nenhum resultado para "${search}".`
+                    : filter
+                      ? 'Nenhuma tarefa nessa categoria.'
+                      : 'Nenhuma tarefa ainda. Clique em "+ Nova" para começar.'}
                 </p>
               </div>
             ) : (

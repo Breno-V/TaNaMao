@@ -3,14 +3,6 @@ import { webpush } from '../routes/push.js'
 
 const INTERVAL_MS = 30 * 60 * 1000
 
-function getToday() {
-  const d = new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-}
-
 function sendNotification(sub, title, body) {
   const payload = JSON.stringify({
     title,
@@ -29,7 +21,6 @@ function sendNotification(sub, title, body) {
 async function checkAndNotify() {
   try {
     const db = getPool()
-    const today = getToday()
 
     const { rows: subscriptions } = await db.query(
       `SELECT endpoint, p256dh, auth, usuario_id
@@ -48,15 +39,26 @@ async function checkAndNotify() {
       const { rows: dueTasks } = await db.query(
         `SELECT titulo, data_entrega FROM tarefas
          WHERE concluida = false AND usuario_id = $1
-         AND data_entrega IS NOT NULL AND data_entrega <= $2
+         AND data_entrega IS NOT NULL AND data_entrega::date <= CURRENT_DATE
          ORDER BY data_entrega ASC`,
-        [userId, today]
+        [userId]
       )
 
       if (dueTasks.length === 0) continue
 
-      const todayTasks = dueTasks.filter(t => t.data_entrega === today)
-      const overdueTasks = dueTasks.filter(t => t.data_entrega < today)
+      const now = new Date()
+      const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+
+      const todayTasks = dueTasks.filter(t => {
+        const d = t.data_entrega instanceof Date ? t.data_entrega : new Date(t.data_entrega)
+        const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+        return ds === todayLocal
+      })
+      const overdueTasks = dueTasks.filter(t => {
+        const d = t.data_entrega instanceof Date ? t.data_entrega : new Date(t.data_entrega)
+        const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+        return ds < todayLocal
+      })
 
       let title = ''
       let body = ''

@@ -81,16 +81,15 @@ export default function SettingsPanel({ open, onClose, theme, onToggleTheme }) {
   const [installable, setInstallable] = useState(false)
   const [installEvent, setInstallEvent] = useState(null)
   const [vapidKey, setVapidKey] = useState('')
+  const triggerRef = useRef(null)
 
   useEffect(() => {
-    if (!open) return
-    const handler = (e) => {
-      e.preventDefault()
-      setInstallEvent(e)
-      setInstallable(true)
+    if (open) {
+      triggerRef.current = document.activeElement
+    } else if (triggerRef.current) {
+      triggerRef.current.focus()
+      triggerRef.current = null
     }
-    window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [open])
 
   useEffect(() => {
@@ -135,10 +134,13 @@ export default function SettingsPanel({ open, onClose, theme, onToggleTheme }) {
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(publicKey),
         })
+        const subBody = newSub.toJSON()
+        subBody.reminders = true
         await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newSub.toJSON()),
+          credentials: 'include',
+          body: JSON.stringify(subBody),
         })
         setPushEnabled(true)
         setReminderEnabled(true)
@@ -156,6 +158,7 @@ export default function SettingsPanel({ open, onClose, theme, onToggleTheme }) {
         await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(newSub),
         })
         setReminderEnabled(!reminderEnabled)

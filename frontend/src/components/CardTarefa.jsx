@@ -1,15 +1,23 @@
-import { toLocalDate } from '../utils/date'
+import { toLocalDate, toLocalDatetime, hasTimeComponent, formatTime } from '../utils/date'
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
   const d = toLocalDate(dateStr)
   const day = String(d.getDate()).padStart(2, '0')
   const month = String(d.getMonth() + 1).padStart(2, '0')
-  return `${day}/${month}`
+  let result = `${day}/${month}`
+  const time = formatTime(dateStr)
+  if (time) result += ` ${time}`
+  return result
 }
 
 function isUrgent(dateStr) {
   if (!dateStr) return false
+  if (hasTimeComponent(dateStr)) {
+    const target = toLocalDatetime(dateStr)
+    if (isNaN(target.getTime())) return false
+    return target <= new Date()
+  }
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const target = toLocalDate(dateStr)
@@ -42,7 +50,9 @@ function daysOverdue(dateStr) {
   today.setHours(0, 0, 0, 0)
   const target = toLocalDate(dateStr)
   target.setHours(0, 0, 0, 0)
-  return Math.floor((today - target) / (1000 * 60 * 60 * 24))
+  const diff = today.getTime() - target.getTime()
+  if (diff < 0) return 0
+  return Math.floor(diff / (1000 * 60 * 60 * 24))
 }
 
 const TAG_CLASSES = {
@@ -87,12 +97,12 @@ export default function CardTarefa({ tarefa, onToggle, onEdit, onDelete, compact
           {tarefa.titulo}
         </span>
         <div className="card-header-right">
-          {!compact && !tarefa.concluida && today && (
+          {!compact && !tarefa.concluida && today && !urgent && (
             <span className="badge badge--today">Vence hoje</span>
           )}
-          {!compact && !tarefa.concluida && overdue > 0 && (
+          {!compact && !tarefa.concluida && (urgent || overdue > 0) && (
             <span className="badge badge--overdue">
-              {overdue === 1 ? '1 dia' : `${overdue} dias`}
+              {overdue === 0 ? 'Atrasada' : overdue === 1 ? '1 dia' : `${overdue} dias`}
             </span>
           )}
           {tarefa.data_entrega && (

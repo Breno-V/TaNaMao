@@ -40,7 +40,8 @@ router.get('/vapid-public-key', (req, res) => {
 
 router.post('/subscribe', authMiddleware, async (req, res) => {
   try {
-    const { endpoint, keys, reminders } = req.body
+    const { endpoint, keys } = req.body
+    const reminders = req.body.reminders ?? false
     if (!endpoint || !keys || !keys.p256dh || !keys.auth) {
       return res.status(400).json({ error: 'Invalid subscription.' })
     }

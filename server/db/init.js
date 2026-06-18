@@ -54,6 +54,7 @@ export async function initDb() {
 
       ALTER TABLE tarefas ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
       ALTER TABLE push_subscriptions ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
+      ALTER TABLE tarefas ALTER COLUMN data_entrega TYPE TIMESTAMP USING data_entrega::timestamp;
     `)
 
     const { rows } = await client.query('SELECT COUNT(*)::int as c FROM categorias')

@@ -16,8 +16,10 @@ function getProximas(tasks) {
     .sort((a, b) => toLocalDate(a.data_entrega) - toLocalDate(b.data_entrega))
 }
 
-export default function ProximasTarefas({ tasks, onToggle, onEdit, onDelete }) {
-  const proximas = getProximas(tasks)
+export default function ProximasTarefas({ tasks, search, onToggle, onEdit, onDelete }) {
+  const proximas = search
+    ? getProximas(tasks).filter(t => t.titulo?.toLowerCase().includes(search.toLowerCase()))
+    : getProximas(tasks)
 
   if (proximas.length === 0) return null
 

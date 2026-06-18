@@ -41,18 +41,19 @@ router.get('/', tryHandler(async (req, res) => {
   res.json(rows.map(tarefaComCategorias))
 }))
 
-function toLocalDate(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number)
-  return new Date(y, m - 1, d)
+function parseDatetime(dateStr) {
+  if (!dateStr) return new Date(NaN)
+  const d = new Date(dateStr)
+  return isNaN(d.getTime()) ? new Date(NaN) : d
 }
 
 function isPastDate(dateStr) {
   if (!dateStr) return false
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const target = toLocalDate(dateStr)
-  target.setHours(0, 0, 0, 0)
-  return target < today
+  const target = parseDatetime(dateStr)
+  if (isNaN(target.getTime())) return false
+  const now = new Date()
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  return target < todayStart
 }
 
 router.post('/', tryHandler(async (req, res) => {

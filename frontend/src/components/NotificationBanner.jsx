@@ -25,11 +25,13 @@ export default function NotificationBanner() {
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(publicKey),
         })
+        const subBody = sub.toJSON()
+        subBody.reminders = true
         await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify(sub.toJSON()),
+          body: JSON.stringify(subBody),
         })
       } catch {}
     }
