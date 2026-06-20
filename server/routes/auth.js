@@ -56,7 +56,7 @@ router.post('/register', authLimiter, tryHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 24 * 60 * 60 * 1000,
   })
   res.status(201).json({ id: user.id, nome: user.nome, email: user.email, onboarded: user.onboarded })
 }))
@@ -89,7 +89,7 @@ router.post('/login', authLimiter, tryHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 24 * 60 * 60 * 1000,
   })
   res.json({ id: user.id, nome: user.nome, email: user.email, onboarded: user.onboarded })
 }))

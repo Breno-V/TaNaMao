@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3001
 
 const isProd = process.env.NODE_ENV === 'production'
 
-const cspStyles = ["'self'"]
+const cspStyles = ["'self'", "https://fonts.googleapis.com"]
 if (!isProd) cspStyles.push("'unsafe-inline'")
 
 app.use(helmet({
@@ -33,7 +33,7 @@ app.use(helmet({
       scriptSrc: ["'self'"],
       styleSrc: cspStyles,
       imgSrc: ["'self'", "data:", "https:"],
-      fontSrc: ["'self'"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
       connectSrc: ["'self'"],
     },
   },
