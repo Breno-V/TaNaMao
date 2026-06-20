@@ -73,6 +73,19 @@ function InnerApp() {
   useEffect(() => { if (user) fetchTasks() }, [fetchTasks, user])
 
   useEffect(() => {
+    if (!user || tasks.length === 0) return
+    const params = new URLSearchParams(window.location.search)
+    const editId = params.get('editTask')
+    if (editId) {
+      const task = tasks.find(t => t.id === Number(editId))
+      if (task) {
+        openEdit(task)
+        window.history.replaceState({}, '', '/')
+      }
+    }
+  }, [user, tasks])
+
+  useEffect(() => {
     if (filter) {
       localStorage.setItem('taskFilter', filter)
     } else {

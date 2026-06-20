@@ -231,7 +231,7 @@ export default function SettingsPanel({ open, onClose, theme, onToggleTheme }) {
                 <span className="drawer-item-icon"><ClockIcon /></span>
                 <div>
                   <div className="drawer-item-label">Lembretes de vencimento</div>
-                  <div className="drawer-item-desc drawer-item-mono">Verifica a cada 30 minutos</div>
+                  <div className="drawer-item-desc drawer-item-mono">Lembretes por data de vencimento</div>
                 </div>
               </div>
               <Toggle
