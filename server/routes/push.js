@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import rateLimit from 'express-rate-limit'
 import { getPool } from '../db/init.js'
 import webpush from 'web-push'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
@@ -38,7 +39,15 @@ router.get('/vapid-public-key', (req, res) => {
   res.type('text/plain').send(vapidKeys.publicKey)
 })
 
-router.post('/subscribe', authMiddleware, async (req, res) => {
+const pushLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { error: 'Muitas requisições. Tente novamente em 1 minuto.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+router.post('/subscribe', authMiddleware, pushLimiter, async (req, res) => {
   try {
     const { endpoint, keys } = req.body
     const reminders = req.body.reminders ?? false
@@ -67,7 +76,7 @@ router.post('/subscribe', authMiddleware, async (req, res) => {
   }
 })
 
-router.post('/unsubscribe', authMiddleware, async (req, res) => {
+router.post('/unsubscribe', authMiddleware, pushLimiter, async (req, res) => {
   try {
     const { endpoint } = req.body
     if (!endpoint) return res.status(400).json({ error: 'Missing endpoint.' })

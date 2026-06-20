@@ -1,10 +1,19 @@
 import { Router } from 'express'
+import rateLimit from 'express-rate-limit'
 import { getPool } from '../db/init.js'
 import { authMiddleware } from '../middleware/auth.js'
 
 const router = Router()
 
 router.use(authMiddleware)
+
+const writeLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  message: { error: 'Muitas requisições. Tente novamente em 1 minuto.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
 
 function tryHandler(fn) {
   return (req, res, next) => {
@@ -23,7 +32,9 @@ router.get('/', tryHandler(async (req, res) => {
   res.json(rows)
 }))
 
-router.post('/', tryHandler(async (req, res) => {
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/
+
+router.post('/', writeLimiter, tryHandler(async (req, res) => {
   const db = getPool()
   const { nome, cor } = req.body
 
@@ -32,6 +43,9 @@ router.post('/', tryHandler(async (req, res) => {
   }
   if (nome.length > 30) {
     return res.status(400).json({ error: 'O nome deve ter no máximo 30 caracteres.' })
+  }
+  if (cor !== undefined && !HEX_COLOR_RE.test(cor)) {
+    return res.status(400).json({ error: 'Cor inválida. Use formato hexadecimal (#RRGGBB).' })
   }
 
   try {
@@ -49,7 +63,7 @@ router.post('/', tryHandler(async (req, res) => {
   }
 }))
 
-router.put('/:id', tryHandler(async (req, res) => {
+router.put('/:id', writeLimiter, tryHandler(async (req, res) => {
   const db = getPool()
   const { id } = req.params
   const { nome, cor } = req.body
@@ -74,6 +88,7 @@ router.put('/:id', tryHandler(async (req, res) => {
     params.push(nome.trim())
   }
   if (cor !== undefined) {
+    if (!HEX_COLOR_RE.test(cor)) return res.status(400).json({ error: 'Cor inválida. Use formato hexadecimal (#RRGGBB).' })
     updates.push(`cor = $${idx++}`)
     params.push(cor)
   }
@@ -95,7 +110,7 @@ router.put('/:id', tryHandler(async (req, res) => {
   }
 }))
 
-router.delete('/:id', tryHandler(async (req, res) => {
+router.delete('/:id', writeLimiter, tryHandler(async (req, res) => {
   const db = getPool()
   const { id } = req.params
 

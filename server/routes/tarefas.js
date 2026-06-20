@@ -1,10 +1,19 @@
 import { Router } from 'express'
+import rateLimit from 'express-rate-limit'
 import { getPool } from '../db/init.js'
 import { authMiddleware } from '../middleware/auth.js'
 
 const router = Router()
 
 router.use(authMiddleware)
+
+const writeLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  message: { error: 'Muitas requisições. Tente novamente em 1 minuto.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
 
 function tryHandler(fn) {
   return (req, res, next) => {
@@ -57,12 +66,18 @@ function isPastDate(dateStr) {
   return target < todayStart
 }
 
-router.post('/', tryHandler(async (req, res) => {
+router.post('/', writeLimiter, tryHandler(async (req, res) => {
   const db = getPool()
   const { titulo, descricao, data_entrega, categorias } = req.body
 
   if (!titulo || !titulo.trim()) {
     return res.status(400).json({ error: 'O título é obrigatório.' })
+  }
+  if (titulo.length > 100) {
+    return res.status(400).json({ error: 'O título deve ter no máximo 100 caracteres.' })
+  }
+  if (descricao && descricao.length > 500) {
+    return res.status(400).json({ error: 'A descrição deve ter no máximo 500 caracteres.' })
   }
 
   if (isPastDate(data_entrega)) {
@@ -102,10 +117,17 @@ router.post('/', tryHandler(async (req, res) => {
   res.status(201).json(tarefaComCategorias({ ...row, categorias: catRow.categorias }))
 }))
 
-router.put('/:id', tryHandler(async (req, res) => {
+router.put('/:id', writeLimiter, tryHandler(async (req, res) => {
   const db = getPool()
   const { id } = req.params
   const { titulo, descricao, data_entrega, concluida, categorias } = req.body
+
+  if (titulo !== undefined && (!titulo.trim() || titulo.length > 100)) {
+    return res.status(400).json({ error: 'O título deve ter entre 1 e 100 caracteres.' })
+  }
+  if (descricao !== undefined && descricao.length > 500) {
+    return res.status(400).json({ error: 'A descrição deve ter no máximo 500 caracteres.' })
+  }
 
   if (data_entrega !== undefined && isPastDate(data_entrega)) {
     return res.status(400).json({ error: 'A data não pode ser anterior a hoje.' })
@@ -157,7 +179,7 @@ router.put('/:id', tryHandler(async (req, res) => {
   res.json(tarefaComCategorias({ ...row, categorias: catRow.categorias }))
 }))
 
-router.put('/reorder', tryHandler(async (req, res) => {
+router.put('/reorder', writeLimiter, tryHandler(async (req, res) => {
   const db = getPool()
   const { orders } = req.body
   if (!Array.isArray(orders)) {
@@ -189,7 +211,7 @@ router.put('/reorder', tryHandler(async (req, res) => {
   }
 }))
 
-router.delete('/:id', tryHandler(async (req, res) => {
+router.delete('/:id', writeLimiter, tryHandler(async (req, res) => {
   const db = getPool()
   const { id } = req.params
   await db.query('DELETE FROM tarefas WHERE id = $1 AND usuario_id = $2', [id, req.user.id])
