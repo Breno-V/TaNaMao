@@ -47,6 +47,7 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.url.includes('/api/')) return
+  if (!event.request.url.startsWith(self.location.origin)) return
   event.respondWith(
     caches.match(event.request).then(cached => {
       const fetchPromise = fetch(event.request).then(res => {
