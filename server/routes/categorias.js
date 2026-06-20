@@ -55,10 +55,13 @@ router.put('/:id', tryHandler(async (req, res) => {
   const { nome, cor } = req.body
 
   const { rows: [cat] } = await db.query(
-    'SELECT id FROM categorias WHERE id = $1 AND usuario_id = $2',
-    [id, req.user.id]
+    'SELECT id, usuario_id FROM categorias WHERE id = $1',
+    [id]
   )
   if (!cat) return res.status(404).json({ error: 'Tag não encontrada.' })
+  if (cat.usuario_id !== req.user.id) {
+    return res.status(403).json({ error: 'Tags padrão não podem ser alteradas.' })
+  }
 
   const updates = []
   const params = []
@@ -97,10 +100,13 @@ router.delete('/:id', tryHandler(async (req, res) => {
   const { id } = req.params
 
   const { rows: [cat] } = await db.query(
-    'SELECT id FROM categorias WHERE id = $1 AND usuario_id = $2',
-    [id, req.user.id]
+    'SELECT id, usuario_id FROM categorias WHERE id = $1',
+    [id]
   )
   if (!cat) return res.status(404).json({ error: 'Tag não encontrada.' })
+  if (cat.usuario_id !== req.user.id) {
+    return res.status(403).json({ error: 'Tags padrão não podem ser excluídas.' })
+  }
 
   const { rows: [active] } = await db.query(
     `SELECT COUNT(*)::int AS count FROM tarefa_categoria tc
