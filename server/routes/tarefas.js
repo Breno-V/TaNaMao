@@ -53,8 +53,11 @@ router.get('/', tryHandler(async (req, res) => {
 
 function parseDatetime(dateStr) {
   if (!dateStr) return new Date(NaN)
-  const d = new Date(dateStr)
-  return isNaN(d.getTime()) ? new Date(NaN) : d
+  const [datePart, timePart] = dateStr.split('T')
+  const [y, m, d] = datePart.split('-').map(Number)
+  if (!timePart) return new Date(y, m - 1, d)
+  const [hh, mm] = timePart.split(':').map(Number)
+  return new Date(y, m - 1, d, hh, mm)
 }
 
 function isPastDate(dateStr) {
