@@ -10,6 +10,9 @@ export function getPool() {
 export async function initDb() {
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false,
+    },
   })
 
   const client = await pool.connect()
