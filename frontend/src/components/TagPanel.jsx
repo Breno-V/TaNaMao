@@ -60,7 +60,7 @@ function computeTagCounts(tasks) {
   return counts
 }
 
-export default function TagPanel({ categories = [], onCategoryChange, tasks = [], variant = 'aside' }) {
+export default function TagPanel({ categories = [], onCategoryChange, tasks = [], variant = 'aside', activeFilter = null, onFilter }) {
   const [newTagName, setNewTagName] = useState('')
   const [newTagColor, setNewTagColor] = useState('#2B5F5F')
   const [tagSubmitting, setTagSubmitting] = useState(false)
@@ -135,11 +135,19 @@ export default function TagPanel({ categories = [], onCategoryChange, tasks = []
           >
             <GearIcon />
           </button>
+          <button
+            className={`tag-pill ${activeFilter === null ? 'tag-pill--active' : ''}`}
+            onClick={() => onFilter?.(null)}
+            aria-label="Todas as tags"
+          >
+            <span className="tag-pill-name">Todas</span>
+            <span className="tag-pill-count">{tasks.length}</span>
+          </button>
           {categories.map(cat => (
             <button
               key={cat.id}
-              className="tag-pill"
-              onClick={() => {}} // filter handled by KPI
+              className={`tag-pill ${activeFilter === cat.id ? 'tag-pill--active' : ''}`}
+              onClick={() => onFilter?.(activeFilter === cat.id ? null : cat.id)}
               aria-label={cat.nome}
             >
               <span className="tag-pill-dot" style={{ backgroundColor: cat.cor }} />
@@ -206,20 +214,32 @@ export default function TagPanel({ categories = [], onCategoryChange, tasks = []
       <h3 className="tag-aside-title">Tags</h3>
 
       <div className="tag-aside-list">
+        <button
+          className={`tag-aside-item tag-aside-item--all ${activeFilter === null ? 'tag-aside-item--active' : ''}`}
+          onClick={() => onFilter?.(null)}
+        >
+          <span className="tag-aside-item-name">Todas</span>
+          <span className="tag-aside-item-count">{tasks.length}</span>
+        </button>
         {categories.map(cat => (
-          <div key={cat.id} className="tag-aside-item" style={{ borderLeftColor: cat.cor }}>
+          <button
+            key={cat.id}
+            className={`tag-aside-item ${activeFilter === cat.id ? 'tag-aside-item--active' : ''}`}
+            style={{ borderLeftColor: cat.cor }}
+            onClick={() => onFilter?.(activeFilter === cat.id ? null : cat.id)}
+          >
             <span className="tag-aside-item-color" style={{ backgroundColor: cat.cor }} />
             <span className="tag-aside-item-name">{cat.nome}</span>
             <span className="tag-aside-item-count">{tagCounts[cat.id] || 0}</span>
             <button
               className="tag-aside-item-delete"
-              onClick={() => confirmDelete(cat.id)}
+              onClick={e => { e.stopPropagation(); confirmDelete(cat.id) }}
               aria-label={`Excluir tag ${cat.nome}`}
               title="Excluir"
             >
               <TrashIcon />
             </button>
-          </div>
+          </button>
         ))}
         {categories.length === 0 && (
           <p className="tag-aside-empty">Nenhuma tag ainda.</p>

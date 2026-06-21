@@ -54,7 +54,6 @@ function InnerApp() {
   const [editing, setEditing] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [search, setSearch] = useState('')
-  const [draggedId, setDraggedId] = useState(null)
   const [showSettings, setShowSettings] = useState(false)
   const [showAccount, setShowAccount] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(false)
@@ -202,44 +201,6 @@ function InnerApp() {
     }
   }
 
-  async function handleReorder(tasks) {
-    const orders = tasks.map((t, i) => ({ id: t.id, ordem: i }))
-    try {
-      await fetch(`${API}/tarefas/reorder`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ orders }),
-      })
-    } catch (err) {
-      console.error('Erro ao reordenar:', err)
-      toast('Erro ao reordenar', 'error')
-    }
-  }
-
-  function handleDragStart(id) {
-    setDraggedId(id)
-  }
-
-  function handleDragOver(e) {
-    e.preventDefault()
-  }
-
-  function handleDrop(targetId) {
-    if (draggedId === null || draggedId === targetId) {
-      setDraggedId(null)
-      return
-    }
-    const reordered = [...allFilteredTasks]
-    const fromIdx = reordered.findIndex(t => t.id === draggedId)
-    const toIdx = reordered.findIndex(t => t.id === targetId)
-    if (fromIdx === -1 || toIdx === -1) { setDraggedId(null); return }
-    const [moved] = reordered.splice(fromIdx, 1)
-    reordered.splice(toIdx, 0, moved)
-    handleReorder(reordered)
-    setDraggedId(null)
-  }
-
   function openEdit(tarefa) {
     setEditing(tarefa)
     setShowForm(true)
@@ -303,6 +264,8 @@ function InnerApp() {
             categories={categories}
             onCategoryChange={fetchCategories}
             tasks={tasks}
+            activeFilter={filter}
+            onFilter={setFilter}
           />
         </aside>
         <main className="main-content">
@@ -318,6 +281,8 @@ function InnerApp() {
             categories={categories}
             onCategoryChange={fetchCategories}
             tasks={tasks}
+            activeFilter={filter}
+            onFilter={setFilter}
           />
 
           <ProximasTarefas
@@ -392,10 +357,6 @@ function InnerApp() {
                       onToggle={handleToggle}
                       onEdit={openEdit}
                       onDelete={handleDelete}
-                      onDragStart={handleDragStart}
-                      onDragOver={handleDragOver}
-                      onDrop={handleDrop}
-                      isDragging={draggedId === t.id}
                     />
                   ))
                 )}
@@ -404,6 +365,13 @@ function InnerApp() {
           )}
         </main>
       </div>
+
+      <button className="fab" onClick={openNew} aria-label="Nova tarefa">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <line x1="11" y1="4" x2="11" y2="18" />
+          <line x1="4" y1="11" x2="18" y2="11" />
+        </svg>
+      </button>
 
       {showForm && (
         <FormTarefa

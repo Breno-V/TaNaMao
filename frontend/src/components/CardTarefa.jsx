@@ -55,7 +55,7 @@ function daysOverdue(dateStr) {
   return Math.floor(diff / (1000 * 60 * 60 * 24))
 }
 
-export default function CardTarefa({ tarefa, onToggle, onEdit, onDelete, compact, onDragStart, onDragOver, onDrop, isDragging }) {
+export default function CardTarefa({ tarefa, onToggle, onEdit, onDelete, compact }) {
   const urgent = isUrgent(tarefa.data_entrega)
   const upcoming = isUpcoming(tarefa.data_entrega)
   const today = isToday(tarefa.data_entrega)
@@ -64,16 +64,9 @@ export default function CardTarefa({ tarefa, onToggle, onEdit, onDelete, compact
   let cardClass = 'card'
   if (urgent) cardClass += ' card-urgent'
   else if (upcoming && !compact) cardClass += ' card-upcoming'
-  if (isDragging) cardClass += ' card-dragging'
 
   return (
-    <div
-      className={cardClass}
-      draggable={!compact}
-      onDragStart={() => onDragStart?.(tarefa.id)}
-      onDragOver={onDragOver}
-      onDrop={() => onDrop?.(tarefa.id)}
-    >
+    <div className={cardClass}>
       <div className="card-header">
         <div className="card-title-wrap">
           <button

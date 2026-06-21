@@ -1095,19 +1095,33 @@ body {
   background: var(--surface-hover);
 }
 
-/* Drag and drop */
-.card-dragging {
-  opacity: 0.4;
-  border-style: dashed;
-  border-color: var(--accent);
+/* FAB */
+.fab {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 40%, transparent);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.card[draggable="true"] {
-  cursor: grab;
+.fab:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 28px color-mix(in srgb, var(--accent) 50%, transparent);
 }
 
-.card[draggable="true"]:active {
-  cursor: grabbing;
+.fab:active {
+  transform: scale(0.95);
 }
 
 /* Date input clear button */
@@ -1826,17 +1840,32 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
   padding: 6px 10px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   border-radius: 6px;
   font-size: 0.82rem;
-  transition: box-shadow 0.2s;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow 0.15s, background 0.15s;
 }
 
 .tag-aside-item:hover {
   box-shadow: var(--shadow-hover);
+}
+
+.tag-aside-item--active {
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  border-left-width: 4px;
+  box-shadow: var(--shadow-hover);
+}
+
+.tag-aside-item--all {
+  border-left-color: var(--text-secondary);
 }
 
 .tag-aside-item-color {
@@ -2668,5 +2697,11 @@ body {
 @media (max-height: 600px) {
   .auth-watermark {
     display: none;
+  }
+}
+
+@media (max-width: 959px) {
+  .fab {
+    display: flex;
   }
 }
