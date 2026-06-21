@@ -14,6 +14,7 @@ import RegisterForm from './components/RegisterForm'
 import { ToastProvider, useToast } from './components/Toast'
 import LoadingScreen from './components/LoadingScreen'
 import OnboardingModal from './components/OnboardingModal'
+import TagPanel from './components/TagPanel'
 import { toLocalDate } from './utils/date'
 import './App.css'
 
@@ -295,95 +296,114 @@ function InnerApp() {
         </div>
       </header>
 
-      <KpiFilter
-        tasks={tasks}
-        active={filter}
-        onChange={setFilter}
-        categories={categories}
-      />
+      <div className="app-content">
+        <aside className="tag-aside-desktop">
+          <TagPanel
+            variant="aside"
+            categories={categories}
+            onCategoryChange={fetchCategories}
+            tasks={tasks}
+          />
+        </aside>
+        <main className="main-content">
+          <KpiFilter
+            tasks={tasks}
+            active={filter}
+            onChange={setFilter}
+            categories={categories}
+          />
 
-      <ProximasTarefas
-        tasks={periodoTasks}
-        search={search}
-        onToggle={handleToggle}
-        onEdit={openEdit}
-        onDelete={handleDelete}
-      />
+          <TagPanel
+            variant="pills"
+            categories={categories}
+            onCategoryChange={fetchCategories}
+            tasks={tasks}
+          />
 
-      <div className="search-bar">
-        <svg className="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" width="14" height="14">
-          <circle cx="7" cy="7" r="5" />
-          <line x1="11" y1="11" x2="14.5" y2="14.5" />
-        </svg>
-        <input
-          className="search-input"
-          type="text"
-          placeholder="Buscar tarefa..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-        {search && (
-          <button className="search-clear" onClick={() => setSearch('')}>
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" width="14" height="14">
-              <line x1="3" y1="3" x2="13" y2="13" />
-              <line x1="13" y1="3" x2="3" y2="13" />
+          <ProximasTarefas
+            tasks={periodoTasks}
+            search={search}
+            onToggle={handleToggle}
+            onEdit={openEdit}
+            onDelete={handleDelete}
+          />
+
+          <div className="search-bar">
+            <svg className="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" width="14" height="14">
+              <circle cx="7" cy="7" r="5" />
+              <line x1="11" y1="11" x2="14.5" y2="14.5" />
             </svg>
-          </button>
-        )}
-      </div>
-
-      {loading ? (
-        <div className="section">
-          <div className="section-header">
-            <div className="skeleton skeleton-text skeleton-title" />
-          </div>
-          {[1, 2, 3].map(i => (
-            <div key={i} className="card skeleton-card">
-              <div className="skeleton skeleton-line skeleton-line--short" />
-              <div className="skeleton skeleton-line" />
-              <div className="skeleton skeleton-line skeleton-line--long" />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <>
-          <div className="section">
-            <div className="section-header">
-              <h2 className="section-title">Todas as tarefas</h2>
-              <button className="add-btn" onClick={openNew}>
-                + Nova
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Buscar tarefa..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            {search && (
+              <button className="search-clear" onClick={() => setSearch('')}>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" width="14" height="14">
+                  <line x1="3" y1="3" x2="13" y2="13" />
+                  <line x1="13" y1="3" x2="3" y2="13" />
+                </svg>
               </button>
-            </div>
-
-            {allFilteredTasks.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-state-icon" aria-hidden="true">📋</div>
-                <p className="empty-state-text">
-                  {search
-                    ? `Nenhum resultado para "${search}".`
-                    : filter
-                      ? 'Nenhuma tarefa com essa tag.'
-                      : 'Nenhuma tarefa ainda. Clique em "+ Nova" para começar.'}
-                </p>
-              </div>
-            ) : (
-              allFilteredTasks.map(t => (
-                <CardTarefa
-                  key={t.id}
-                  tarefa={t}
-                  onToggle={handleToggle}
-                  onEdit={openEdit}
-                  onDelete={handleDelete}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                  isDragging={draggedId === t.id}
-                />
-              ))
             )}
           </div>
-        </>
-      )}
+
+          {loading ? (
+            <div className="section">
+              <div className="section-header">
+                <div className="skeleton skeleton-text skeleton-title" />
+              </div>
+              {[1, 2, 3].map(i => (
+                <div key={i} className="card skeleton-card">
+                  <div className="skeleton skeleton-line skeleton-line--short" />
+                  <div className="skeleton skeleton-line" />
+                  <div className="skeleton skeleton-line skeleton-line--long" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="section">
+                <div className="section-header">
+                  <h2 className="section-title">Todas as tarefas</h2>
+                  <button className="add-btn" onClick={openNew}>
+                    + Nova
+                  </button>
+                </div>
+
+                {allFilteredTasks.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-state-icon" aria-hidden="true">📋</div>
+                    <p className="empty-state-text">
+                      {search
+                        ? `Nenhum resultado para "${search}".`
+                        : filter
+                          ? 'Nenhuma tarefa com essa tag.'
+                          : 'Nenhuma tarefa ainda. Clique em "+ Nova" para começar.'}
+                    </p>
+                  </div>
+                ) : (
+                  allFilteredTasks.map(t => (
+                    <CardTarefa
+                      key={t.id}
+                      tarefa={t}
+                      onToggle={handleToggle}
+                      onEdit={openEdit}
+                      onDelete={handleDelete}
+                      onDragStart={handleDragStart}
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                      isDragging={draggedId === t.id}
+                    />
+                  ))
+                )}
+              </div>
+            </>
+          )}
+        </main>
+      </div>
 
       {showForm && (
         <FormTarefa
@@ -409,9 +429,6 @@ function InnerApp() {
         onClose={() => setShowSettings(false)}
         theme={theme}
         onToggleTheme={toggleTheme}
-        categories={categories}
-        onCategoryChange={fetchCategories}
-        tasks={tasks}
         user={user}
         onOpenAccount={handleOpenAccount}
       />
