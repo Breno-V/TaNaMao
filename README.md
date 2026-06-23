@@ -1,6 +1,6 @@
-# organizador
+# TáNaMão
 
-> **Live at:** [organizador-de-tarefas-wtcf.onrender.com](https://organizador-de-tarefas-wtcf.onrender.com)
+> **Live at:** [tanamao.onrender.com](https://tanamao.onrender.com)
 
 A lightweight task organizer for your daily life. Categorize tasks, set deadlines, get push notifications — all with a clean, dark-mode-ready interface.
 
@@ -23,7 +23,7 @@ A lightweight task organizer for your daily life. Categorize tasks, set deadline
 |-------|------------|
 | Frontend | React 18 + Vite |
 | Backend | Express.js |
-| Database | PostgreSQL |
+| Database | PostgreSQL (Neon on Render, local PostgreSQL 17 for dev) |
 | Notifications | Web Push API |
 | Deploy | Render |
 
@@ -31,7 +31,7 @@ A lightweight task organizer for your daily life. Categorize tasks, set deadline
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22
 - PostgreSQL instance
 
 ### Setup

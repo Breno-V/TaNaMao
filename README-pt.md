@@ -1,6 +1,6 @@
-# organizador
+z'# TáNaMão
 
-> **Acesse em:** [organizador-de-tarefas-wtcf.onrender.com](https://organizador-de-tarefas-wtcf.onrender.com)
+> **Acesse em:** [tanamao.onrender.com](https://tanamao.onrender.com)
 
 Um organizador de tarefas leve para o seu dia a dia. Categorize tarefas, defina prazos, receba notificações push — tudo com uma interface limpa e suporte a tema escuro.
 
@@ -23,7 +23,7 @@ Um organizador de tarefas leve para o seu dia a dia. Categorize tarefas, defina 
 |--------|------------|
 | Frontend | React 18 + Vite |
 | Backend | Express.js |
-| Banco de dados | PostgreSQL |
+| Banco de dados | PostgreSQL (Neon no Render, PostgreSQL 17 local para dev) |
 | Notificações | Web Push API |
 | Deploy | Render |
 
@@ -31,14 +31,14 @@ Um organizador de tarefas leve para o seu dia a dia. Categorize tarefas, defina 
 
 ### Pré-requisitos
 
-- Node.js 20+
+- Node.js 22
 - Instância PostgreSQL
 
 ### Configuração
 
 ```bash
 # Clone e instale
-git clone <repo-url>
+git clone https://github.com/Breno-V/tanamao
 cd tanamao
 npm install
 
