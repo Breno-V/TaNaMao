@@ -7,5 +7,4 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22
-      - key: APP_URL
-        value: https://tanamao.onrender.com
+
