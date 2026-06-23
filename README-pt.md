@@ -39,7 +39,7 @@ Um organizador de tarefas leve para o seu dia a dia. Categorize tarefas, defina 
 ```bash
 # Clone e instale
 git clone <repo-url>
-cd organizador-de-tarefas
+cd tanamao
 npm install
 
 # Instale dependências do cliente e servidor
@@ -47,7 +47,7 @@ npm install --prefix frontend
 npm install --prefix server
 
 # Crie o arquivo .env do servidor
-echo 'DATABASE_URL=postgresql://usuario:senha@host:5432/organizador' > server/.env
+echo 'DATABASE_URL=postgresql://usuario:senha@host:5432/tanamao' > server/.env
 echo 'JWT_SECRET=seu-segredo-aqui' >> server/.env
 
 # Inicie em modo dev (cliente + servidor em paralelo)

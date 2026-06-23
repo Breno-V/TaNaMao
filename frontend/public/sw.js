@@ -1,4 +1,4 @@
-const CACHE = 'organizador-v1'
+const CACHE = 'tanamao-v1'
 
 const ASSETS = [
   '/',
@@ -83,14 +83,14 @@ self.addEventListener('push', event => {
         url: data.data?.url || '/',
       },
     }
-    event.waitUntil(self.registration.showNotification(data.title || 'organizador', opts))
+    event.waitUntil(self.registration.showNotification(data.title || 'TáNaMão', opts))
   } catch {
     const opts = {
       body: event.data.text(),
       icon: '/icons/icon-192.svg',
       badge: '/icons/icon-192.svg',
     }
-    event.waitUntil(self.registration.showNotification('organizador', opts))
+    event.waitUntil(self.registration.showNotification('TáNaMão', opts))
   }
 })
 

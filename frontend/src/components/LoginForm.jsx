@@ -54,8 +54,8 @@ export default function LoginForm({ onSwitchToRegister, theme, onToggleTheme }) 
 
       <div className="auth-card">
         <div className="auth-brand">
-          <h1 className="auth-brand-title">organizador</h1>
-          <span className="auth-brand-sub">suas tarefas da semana</span>
+          <h1 className="auth-brand-title">TáNaMão</h1>
+          <span className="auth-brand-sub">tá na mão, sua organização</span>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">

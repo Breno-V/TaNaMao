@@ -55,7 +55,7 @@ export default function RegisterForm({ onSwitchToLogin, theme, onToggleTheme }) 
 
       <div className="auth-card">
         <div className="auth-brand">
-          <h1 className="auth-brand-title">organizador</h1>
+          <h1 className="auth-brand-title">TáNaMão</h1>
           <span className="auth-brand-sub">crie sua conta</span>
         </div>
 

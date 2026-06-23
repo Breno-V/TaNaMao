@@ -28,7 +28,7 @@ function getVapidKeys() {
 
 const vapidKeys = getVapidKeys()
 webpush.setVapidDetails(
-  'mailto:organizador@localhost',
+  'mailto:tanamao@localhost',
   vapidKeys.publicKey,
   vapidKeys.privateKey
 )

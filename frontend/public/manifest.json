@@ -1,7 +1,7 @@
 {
-  "name": "organizador",
-  "short_name": "organizador",
-  "description": "Tarefas da semana — simples, rápido, sem atrito.",
+  "name": "TáNaMão",
+  "short_name": "TáNaMão",
+  "description": "Tá na mão — suas tarefas, organizadas, sem estresse.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F2EFE8",

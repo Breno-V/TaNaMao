@@ -38,8 +38,8 @@ A lightweight task organizer for your daily life. Categorize tasks, set deadline
 
 ```bash
 # Clone and install
-git clone https://github.com/Breno-V/organizador-de-tarefas
-cd organizador-de-tarefas
+git clone https://github.com/Breno-V/tanamao
+cd tanamao
 npm install
 
 # Install client & server deps
@@ -47,7 +47,7 @@ npm install --prefix frontend
 npm install --prefix server
 
 # Create server .env file
-echo 'DATABASE_URL=postgresql://user:pass@host:5432/organizador' > server/.env
+echo 'DATABASE_URL=postgresql://user:pass@host:5432/tanamao' > server/.env
 echo 'JWT_SECRET=your-secret-here' >> server/.env
 
 # Start in dev mode (client + server concurrently)

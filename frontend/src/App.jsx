@@ -235,8 +235,8 @@ function InnerApp() {
       <div className="app">
       <header className="header">
         <div className="header-left">
-          <h1 className="app-title">organizador</h1>
-          <span className="app-subtitle">{user.nome}</span>
+          <h1 className="app-title">TáNaMão</h1>
+          <span className="app-subtitle">tá na mão, {user.nome?.split(' ')[0]}</span>
         </div>
         <div className="header-actions">
           <button className="auth-logout-btn" onClick={logout} title="Sair" aria-label="Sair">

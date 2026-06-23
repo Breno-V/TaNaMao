@@ -1,5 +1,5 @@
 {
-  "name": "organizador-server",
+  "name": "tanamao-server",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -17,6 +17,7 @@
     "jsonwebtoken": "^9.0.3",
     "organizador-de-tarefas": "file:..",
     "pg": "^8.13.0",
+    "tanamao": "file:..",
     "web-push": "^3.6.7"
   }
 }

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: organizador
+    name: tanamao
     env: node
     buildCommand: npm install && npm install --prefix frontend && npm install --prefix server && npm run build
     startCommand: npm start
@@ -8,4 +8,4 @@ services:
       - key: NODE_VERSION
         value: 22
       - key: APP_URL
-        value: https://organizador.onrender.com
+        value: https://tanamao.onrender.com
