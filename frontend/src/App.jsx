@@ -235,8 +235,8 @@ function InnerApp() {
       <div className="app">
       <header className="header">
         <div className="header-left">
-          <h1 className="app-title">TáNaMão</h1>
-          <span className="app-subtitle">tá na mão, {user.nome?.split(' ')[0]}</span>
+          <h1 className="app-title">TáNaMão, </h1>
+          <span className="app-subtitle">{user.nome?.split(' ')[0]}</span>
         </div>
         <div className="header-actions">
           <button className="auth-logout-btn" onClick={logout} title="Sair" aria-label="Sair">
@@ -284,15 +284,7 @@ function InnerApp() {
             activeFilter={filter}
             onFilter={setFilter}
           />
-
-          <ProximasTarefas
-            tasks={periodoTasks}
-            search={search}
-            onToggle={handleToggle}
-            onEdit={openEdit}
-            onDelete={handleDelete}
-          />
-
+          
           <div className="search-bar">
             <svg className="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" width="14" height="14">
               <circle cx="7" cy="7" r="5" />
@@ -314,6 +306,15 @@ function InnerApp() {
               </button>
             )}
           </div>
+
+          <ProximasTarefas
+            tasks={periodoTasks}
+            search={search}
+            onToggle={handleToggle}
+            onEdit={openEdit}
+            onDelete={handleDelete}
+          />
+
 
           {loading ? (
             <div className="section">
