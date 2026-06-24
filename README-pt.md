@@ -1,6 +1,6 @@
 z'# TáNaMão
 
-> **Acesse em:** [tanamao.onrender.com](https://tanamao.onrender.com)
+> **Acesse em:** [tanamao.onrender.com](https://tanamao-scheduler.onrender.com)
 
 Um organizador de tarefas leve para o seu dia a dia. Categorize tarefas, defina prazos, receba notificações push — tudo com uma interface limpa e suporte a tema escuro.
 

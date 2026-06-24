@@ -1,6 +1,6 @@
 # TáNaMão
 
-> **Live at:** [tanamao.onrender.com](https://tanamao.onrender.com)
+> **Live at:** [tanamao.onrender.com](https://tanamao-scheduler.onrender.com)
 
 A lightweight task organizer for your daily life. Categorize tasks, set deadlines, get push notifications — all with a clean, dark-mode-ready interface.
 
