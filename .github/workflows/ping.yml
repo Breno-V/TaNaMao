@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Render
-        run: curl -sS -o /dev/null -w "%{http_code}" https://tanamao.onrender.com
+        run: curl -sS -o /dev/null -w "%{http_code}" https://tanamao-scheduler.onrender.com
